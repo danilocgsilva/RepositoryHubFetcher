@@ -1,0 +1,15 @@
+{
+    "name": "danilocgsilva/repository-hub-fetcher",
+    "autoload": {
+        "psr-4": {
+            "Danilocgsilva\\RepositoryHubFetcher\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Danilo Carlos",
+            "email": "contact@danilocgsilva.me"
+        }
+    ],
+    "require": {}
+}
