@@ -134,18 +134,27 @@ class GithubFetcher extends Fetcher
      */
     private function getApiData(int $page): array
     {
-        $request = new Request(
-            'GET', 
-            "https://api.github.com/users/{$this->githubUserDirectory}/repos?page={$page}&per_page={$this->pageCount}",
-            [
-                'auth' => $this->getAuthData()
-            ]
-        );
-        $response = $this->httpClient->send($request);
-        $stream = $response->getBody();
-        $bodyContent = $stream->getContents();
-        return json_decode((string) $bodyContent);
+        $url = "https://api.github.com/users/{$this->githubUserDirectory}/repos?page={$page}&per_page={$this->pageCount}";
 
+        if (!$this->storage->hasItem($url)) {
+            $request = new Request(
+                'GET', 
+                $url,
+                [
+                    'auth' => $this->getAuthData()
+                ]
+            );
+            $response = $this->httpClient->send($request);
+            $stream = $response->getBody();
+            $bodyContent = $stream->getContents();
+            $bodyContentString = (string) $bodyContent;
+    
+            $this->storage->setItem($url, $bodyContentString);
+        } else {
+            $bodyContentString = $this->storage->getItem($url);
+        }
+        
+        return json_decode($bodyContentString);
     }
 
     /**
