@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Danilocgsilva\RepositoryHubFetcher;
 
-use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Psr7\Request;
 
 class GithubFetcher extends Fetcher
 {
@@ -52,17 +52,28 @@ class GithubFetcher extends Fetcher
 
     private function getApiData(int $page)
     {
-        $response = $this->httpClient->get(
+        $request = new Request(
+            'GET', 
             "https://api.github.com/users/{$this->user}/repos?page={$page}&per_page=20",
             [
-                'auth' => [
-                    $this->user, 
-                    $this->password
-                ]
+                'auth' => $this->getAuthData()
             ]
         );
+        $response = $this->httpClient->send($request);
         $stream = $response->getBody();
         $bodyContent = $stream->getContents();
         return json_decode((string) $bodyContent);
+
+    }
+
+    private function getAuthData(): null | array
+    {
+        if ($this->password === "") {
+            return null;
+        }
+        return [
+            $this->user,
+            $this->password
+        ];
     }
 }
