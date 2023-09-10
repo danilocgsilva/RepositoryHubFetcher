@@ -1,14 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Danilocgsilva\RepositoryHubFetcher;
 
 use GuzzleHttp\Client as HttpClient;
 
-class Fetcher
+abstract class Fetcher
 {
-    public function fetches()
+    protected HttpClient $httpClient;
+
+    public function __construct()
     {
-        $httpClient = new HttpClient();
-        return "hello world!";
+        $this->httpClient = new HttpClient();
     }
 }
