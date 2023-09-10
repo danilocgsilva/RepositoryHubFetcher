@@ -134,18 +134,35 @@ class GithubFetcher extends Fetcher
      */
     private function getApiData(int $page): array
     {
-        $request = new Request(
-            'GET', 
-            "https://api.github.com/users/{$this->githubUserDirectory}/repos?page={$page}&per_page={$this->pageCount}",
-            [
-                'auth' => $this->getAuthData()
-            ]
-        );
-        $response = $this->httpClient->send($request);
-        $stream = $response->getBody();
-        $bodyContent = $stream->getContents();
-        return json_decode((string) $bodyContent);
+        $url = "https://api.github.com/users/{$this->githubUserDirectory}/repos?page={$page}&per_page={$this->pageCount}";
+        $invalidUrlChars = ["/\//", "/:/", "/\?/", "/=/", "/&/"];
+        $urlAsCacheKey = preg_replace($invalidUrlChars, "_", $url);
+        $cachedData = $this->storage->getItem($urlAsCacheKey);
+        if (!$cachedData->isHit()) {
+            $request = new Request(
+                'GET', 
+                $url,
+                [
+                    'auth' => $this->getAuthData()
+                ]
+            );
+            $response = $this->httpClient->send($request);
+            $stream = $response->getBody();
+            $bodyContent = $stream->getContents();
 
+            $bodyContentString = (string) $bodyContent;
+
+            $cachedData->set($bodyContentString);
+            $cachedData->expiresAfter(20);
+            $this->storage->save($cachedData);
+        }
+
+        if ($this->storage->hasItem($urlAsCacheKey)) {
+            $retrievedData = $this->storage->getItem($urlAsCacheKey);
+            $bodyContentString = $retrievedData->get();
+        }
+        
+        return json_decode($bodyContentString);
     }
 
     /**
