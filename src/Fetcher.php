@@ -14,10 +14,29 @@ abstract class Fetcher
     protected HttpClient $httpClient;
     protected $storage;
 
+    /**
+     * Interval for cache expiration
+     *
+     * @var integer
+     */
+    protected int $cacheSecondsTime = 86400;
+
     public function __construct()
     {
         $this->httpClient = new HttpClient();
         $this->buildStorage();
+    }
+
+    /**
+     * Changes the default cache expiration time in seconds
+     *
+     * @param integer $cacheSecondsTime
+     * @return self
+     */
+    public function setCacheSecondsTime(int $cacheSecondsTime): self
+    {
+        $this->cacheSecondsTime = $cacheSecondsTime;
+        return $this;
     }
 
     private function buildStorage()
@@ -27,4 +46,5 @@ abstract class Fetcher
         
         $this->storage = new FilesystemCachePool($filesystem);
     }
+
 }

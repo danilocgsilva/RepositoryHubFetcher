@@ -41,6 +41,8 @@ class GithubFetcher extends Fetcher
      */
     private int $pageCount = 100;
 
+
+
     /**
      * Github user password (not required).
      * 
@@ -96,7 +98,7 @@ class GithubFetcher extends Fetcher
         $this->pagetCount = $pageCount;
         return $this;
     }
-    
+
     /**
      * Fills the repository array
      *
@@ -153,7 +155,7 @@ class GithubFetcher extends Fetcher
             $bodyContentString = (string) $bodyContent;
 
             $cachedData->set($bodyContentString);
-            $cachedData->expiresAfter(20);
+            $cachedData->expiresAfter($this->cacheSecondsTime);
             $this->storage->save($cachedData);
         }
 
