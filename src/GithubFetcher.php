@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Danilocgsilva\RepositoryHubFetcher;
 
-use GuzzleHttp\Psr7\Request;
-
 class GithubFetcher extends Fetcher
 {
     /**
@@ -141,14 +139,13 @@ class GithubFetcher extends Fetcher
         $urlAsCacheKey = preg_replace($invalidUrlChars, "_", $url);
         $cachedData = $this->storage->getItem($urlAsCacheKey);
         if (!$cachedData->isHit()) {
-            $request = new Request(
-                'GET', 
+            $response = $this->httpClient->get(
                 $url,
                 [
                     'auth' => $this->getAuthData()
                 ]
             );
-            $response = $this->httpClient->send($request);
+
             $stream = $response->getBody();
             $bodyContent = $stream->getContents();
 
