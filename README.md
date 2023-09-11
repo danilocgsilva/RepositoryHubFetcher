@@ -2,11 +2,11 @@
 Fetches data from online Repository Hubs, like Github, Bitbucket or Gitlab.
 ## Usage
 
-```
+```php
 use Danilocgsilva\RepositoryHubFetcher\GithubFetcher;
 
 $gitRepositoryFetcher = new GithubFetcher();
-$gitRepositoryFetcher->setGithubUserDirectory('your_github_repository_name');
+$gitRepositoryFetcher->setGithubUserDirectory('your_github_name');
 
 print("<ul>");
 foreach($gitRepositoryFetcher->getRepos() as $repo) {
