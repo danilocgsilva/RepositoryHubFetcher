@@ -14,3 +14,10 @@ foreach($gitRepositoryFetcher->getRepos() as $repo) {
 }
 print("</ul>");
 ```
+
+If you want to get commits from a repository:
+
+```php
+$gitRepositoryFetcher->getCommits($repository);
+```
+This will return an array with commits.
