@@ -109,7 +109,7 @@ class GithubFetcher extends Fetcher
         while (count($reposArrayRaw) > 0) {
             foreach ($reposArrayRaw as $rawRepo) {
                 $repository = new Repository();
-                $repository->setName($rawRepo->name);
+                $repository->setDataFromRaw($rawRepo);
                 $this->repos[] = $repository;
             }
             $page++;
