@@ -103,7 +103,9 @@ class GithubFetcher extends Fetcher
     public function fetches(): void
     {
         $page = 1;
-        $reposArrayRaw = $this->getApiData($page);
+
+        $url = "https://api.github.com/users/{$this->githubUserDirectory}/repos?page={$page}&per_page={$this->pageCount}";
+        $reposArrayRaw = $this->getApiData($url);
         while (count($reposArrayRaw) > 0) {
             foreach ($reposArrayRaw as $rawRepo) {
                 $repository = new Repository();
@@ -111,7 +113,8 @@ class GithubFetcher extends Fetcher
                 $this->repos[] = $repository;
             }
             $page++;
-            $reposArrayRaw = $this->getApiData($page);
+            $url = "https://api.github.com/users/{$this->githubUserDirectory}/repos?page={$page}&per_page={$this->pageCount}";
+            $reposArrayRaw = $this->getApiData($url);
         }
     }
 
@@ -124,16 +127,28 @@ class GithubFetcher extends Fetcher
         return $this->repos;
     }
 
+    public function getCommits(Repository $repository): array
+    {
+        $url = "https://api.github.com/repos/{$this->githubUserDirectory}/{$repository->getName()}/commits";
+        $commitsRawData = $this->getApiData($url);
+
+        $commits = [];
+        foreach ($commitsRawData as $commitData) {
+            $commits[] = (new Commit())->setDataFromRaw($commitData);
+        }
+
+        return $commits;
+    }
+
     /**
      * Burst data from api.
      *
      * @param integer $page
      * @return array
      */
-    private function getApiData(int $page): array
+    private function getApiData(string $url): array
     {
-        $url = "https://api.github.com/users/{$this->githubUserDirectory}/repos?page={$page}&per_page={$this->pageCount}";
-        $invalidUrlChars = ["/\//", "/:/", "/\?/", "/=/", "/&/"];
+        $invalidUrlChars = ["/\//", "/:/", "/\?/", "/=/", "/&/", "/-/"];
         $urlAsCacheKey = preg_replace($invalidUrlChars, "_", $url);
         $cachedData = $this->storage->getItem($urlAsCacheKey);
         if (!$cachedData->isHit()) {
@@ -158,7 +173,7 @@ class GithubFetcher extends Fetcher
             $retrievedData = $this->storage->getItem($urlAsCacheKey);
             $bodyContentString = $retrievedData->get();
         }
-        
+
         return json_decode($bodyContentString);
     }
 
