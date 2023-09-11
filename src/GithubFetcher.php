@@ -39,8 +39,6 @@ class GithubFetcher extends Fetcher
      */
     private int $pageCount = 100;
 
-
-
     /**
      * Github user password (not required).
      * 
@@ -104,7 +102,7 @@ class GithubFetcher extends Fetcher
      */
     public function fetches(): void
     {
-        $page = 0;
+        $page = 1;
         $reposArrayRaw = $this->getApiData($page);
         while (count($reposArrayRaw) > 0) {
             foreach ($reposArrayRaw as $rawRepo) {
