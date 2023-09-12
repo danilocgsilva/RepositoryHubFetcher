@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace Danilocgsilva\RepositoryHubFetcher;
 
+use Generator;
+
 class GithubFetcher extends Fetcher
 {
-    /**
-     * Array of Repository lists
-     */
-    private array $repos = [];
-
     /**
      * Github user for login, if needed.
      *
@@ -100,7 +97,7 @@ class GithubFetcher extends Fetcher
      *
      * @return void
      */
-    public function fetches(): void
+    public function getRepos(): Generator
     {
         $page = 1;
 
@@ -110,21 +107,12 @@ class GithubFetcher extends Fetcher
             foreach ($reposArrayRaw as $rawRepo) {
                 $repository = new Repository();
                 $repository->setDataFromRaw($rawRepo);
-                $this->repos[] = $repository;
+                yield $repository;
             }
             $page++;
             $url = "https://api.github.com/users/{$this->githubUserDirectory}/repos?page={$page}&per_page={$this->pageCount}";
             $reposArrayRaw = $this->getApiData($url);
         }
-    }
-
-    public function getRepos(): array
-    {
-        if (count($this->repos) === 0) {
-           $this->fetches();
-        }
-        
-        return $this->repos;
     }
 
     public function getCommits(Repository $repository): array
